@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { User } from 'src/@app/entities/user';
 import { UsersRepository } from 'src/@app/repositories/users-repository';
 import { PrismaService } from '../prisma.service';
+import { PrismaNotificationMapper } from '../mappers/prisma-notification-mapper';
 
 @Injectable()
 export class PrismaUsersRepository implements UsersRepository {
@@ -16,11 +17,18 @@ export class PrismaUsersRepository implements UsersRepository {
       },
     });
   }
+
   async delete(userId: string): Promise<void> {
     await this.prisma.user.delete({
       where: {
         id: userId,
       },
     });
+  }
+
+ async findMany(): Promise<User[]> {
+    const users = await this.prisma.user.findMany()
+
+    return users.map(PrismaNotificationMapper.toDomain) 
   }
 }
